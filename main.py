@@ -1,6 +1,6 @@
-from project_interactive_learning_tool.questions import question_mode
-from project_interactive_learning_tool.disable_enable import disable_enable_mode
-from project_interactive_learning_tool.practice import practice
+from questions import question_mode
+from disable_enable import disable_enable_mode
+from practice import practice
 import csv
 
 
@@ -23,7 +23,6 @@ def main():
     )
     user_choice = options[int(user_input) - 1]
     mode_choice(user_choice)
-    # save_info()
 
 
 def mode_choice(user_choice):

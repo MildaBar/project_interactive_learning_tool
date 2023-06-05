@@ -1,5 +1,5 @@
 import csv
-from project_interactive_learning_tool.disable_enable import DisableEnableQuestion
+from disable_enable import DisableEnableQuestion
 
 
 class Question:
@@ -9,8 +9,6 @@ class Question:
     # The parent class has an empty save method that is overridden by the child classes to save the question and answer to a file.
     def save(self):
         pass
-
-
 
 
 def save_question_to_csv(file_path, question_type, question_text, answer):
