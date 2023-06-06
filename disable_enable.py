@@ -2,13 +2,12 @@ import csv
 import os
 import shutil
 
-# Users should be able to write the ID of the question they want to disable or enable.
-
 
 class DisableEnableQuestion:
     def __init__(self, file_path):
         self.file_path = file_path
 
+        # check this part
         if not os.path.isfile(self.file_path):
             with open(self.file_path, mode="w", newline="") as file:
                 writer = csv.writer(file)
@@ -62,15 +61,32 @@ def disable_enable_mode():
     while True:
         if user_choice == "disable":
             disable_question = input("Write ID of the question you want to DISABLE: ")
-            make_sure_disable = input("You really want to disable this question? ")
+            question_text, answer = get_answer_and_question(disable_question)
+            make_sure_disable = input(
+                f"Do you want to disablr QUESTION: {question_text}, with ANSWER: {answer}? "
+            )
             if make_sure_disable.lower() == "yes":
                 manager.disable_question(disable_question)
                 print("Question disabled sucessfully.")
                 break
         elif user_choice == "enable":
             enable_question = input("Write ID of the question you want to ENABLE: ")
-            make_sure_enable = input("You really want to enable this question? ")
+            question_text, answer = get_answer_and_question(enable_question)
+            make_sure_enable = input(
+                f"Do you want to enable QUESTION: {question_text}, with ANSWER{answer}? "
+            )
             if make_sure_enable.lower() == "yes":
                 manager.enable_question(enable_question)
                 print("Question enabled sucessfully.")
                 break
+
+
+def get_answer_and_question(question_id):
+    with open("statistics.csv", mode="r") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            if row["ID"] == question_id:
+                question_text = row["QUESTION"]
+                answer = row["ANSWER"]
+                return question_text, answer
+    return None, None
