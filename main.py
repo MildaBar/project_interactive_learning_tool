@@ -1,8 +1,7 @@
 from questions import question_mode
 from disable_enable import disable_enable_mode
 from practice import practice
-import csv
-
+from test_mode import test_mode
 
 def main():
     options = [
@@ -36,7 +35,7 @@ def mode_choice(user_choice):
         case "Practice mode":
             practice()
         case "Test mode":
-            pass
+            test_mode()
         case "Select profile":
             pass
         case _:
