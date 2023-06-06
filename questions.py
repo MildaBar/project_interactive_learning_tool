@@ -1,6 +1,24 @@
 import csv
 from disable_enable import DisableEnableQuestion
 
+def question_mode():
+    while True:
+        try:
+            print("You chose to add questions. Let's start!\n")
+            user_input()
+            if not continue_questions():
+                break
+        except SyntaxError:
+            print("Invalid input.")
+            continue
+
+def continue_questions():
+    while True:
+        add_questions = input("\n" + "Do you want to continue? (yes/no): ").lower()
+        if add_questions == "no":
+            return False
+        elif add_questions == "yes":
+            return True
 
 class Question:
     def __init__(self, question):
@@ -59,22 +77,6 @@ class Free_form_question(Question):
 def count_questions(file_name):
     with open(file_name) as file:
         return sum(1 for line in file if line.startswith("Q") or line.startswith("FFT"))
-
-
-def question_mode():
-    print("You chose to add questions. Let's start!\n")
-    while True:
-        user_input()
-        if input("\n" + "Do you want to continue? (yes/no): ").lower() == "no":
-            count_user_questions = count_questions("statistics.csv")
-            if count_user_questions < 5:
-                print(
-                    f"You need at least 5 questions! You have {count_user_questions} questions"
-                )
-                continue
-            else:
-                break
-
 
 def user_input():
     while True:

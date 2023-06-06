@@ -7,9 +7,16 @@ import csv
 
 # SELECT THE NR OF QUESTIONS FOR THE TEST WHICH IS NOT LARGER THAN THE TOTAL NUMBER OF QUESTIONS ADDED
 def test_mode():
-    print("You chose to have a test! Let's start!")
-    check_question()
-
+    count_user_questions = count_questions("statistics.csv")
+    if count_user_questions < 5:
+        print(
+            f"You need at least 5 questions! You have {count_user_questions} questions"
+        )
+        return
+    else:
+        print("\n" + "You chose to a practice questions. Let's start!")
+        print("You chose to have a test! Let's start!")
+        check_question()
 
 def check_question():
     filename = "statistics.csv"

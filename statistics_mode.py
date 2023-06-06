@@ -16,7 +16,20 @@ class Statistics_view_mode:
 
 
 statistics_info = []
+# 2. in statistics file create a statistic about answered questions
+# df = pd.read_csv("statistics.csv")
 
+# correctly_answered = df["CORRECTLY ANSWERED Q"].sum()
+# total_questions = len(df)
+# 2. in statistics file create a statistic about answered questions
+# df = pd.read_csv("statistics.csv")
+
+# correctly_answered = df["CORRECTLY ANSWERED Q"].sum()
+# total_questions = len(df)
+
+# 3. from statistic depend how questions will be given
+
+# 4. do not show questions that are disabled
 
 
     # import pandas as pd
