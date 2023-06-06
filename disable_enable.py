@@ -63,7 +63,7 @@ def disable_enable_mode():
             disable_question = input("Write ID of the question you want to DISABLE: ")
             question_text, answer = get_answer_and_question(disable_question)
             make_sure_disable = input(
-                f"Do you want to disablr QUESTION: {question_text}, with ANSWER: {answer}? "
+                f"Do you want to disablr QUESTION: '{question_text}', with ANSWER: '{answer}'? "
             )
             if make_sure_disable.lower() == "yes":
                 manager.disable_question(disable_question)
@@ -73,7 +73,7 @@ def disable_enable_mode():
             enable_question = input("Write ID of the question you want to ENABLE: ")
             question_text, answer = get_answer_and_question(enable_question)
             make_sure_enable = input(
-                f"Do you want to enable QUESTION: {question_text}, with ANSWER{answer}? "
+                f"Do you want to enable QUESTION: '{question_text}', with ANSWER: '{answer}'? "
             )
             if make_sure_enable.lower() == "yes":
                 manager.enable_question(enable_question)
