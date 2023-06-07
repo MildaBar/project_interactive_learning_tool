@@ -1,6 +1,7 @@
 import csv
 from disable_enable import DisableEnableQuestion
 
+
 def question_mode():
     while True:
         try:
@@ -12,6 +13,7 @@ def question_mode():
             print("Invalid input.")
             continue
 
+
 def continue_questions():
     while True:
         add_questions = input("\n" + "Do you want to continue? (yes/no): ").lower()
@@ -19,6 +21,7 @@ def continue_questions():
             return False
         elif add_questions == "yes":
             return True
+
 
 class Question:
     def __init__(self, question):
@@ -51,7 +54,9 @@ def save_question_to_csv(file_path, question_type, question_text, answer):
                 "ANSWER": str(answer),
                 "ACTIVITY": True,
                 "Q SHOWN DURING PRACTICE": 0,
-                "WEIGHT OF Q PRACTICE": 1.0
+                "WEIGHT OF Q PRACTICE": 1.0,
+                "Q SHOWN DURING TEST": 0,
+                "CORRECTLY ANSWERED Q": 0,
             }
         )
 
@@ -78,6 +83,7 @@ def count_questions(file_name):
     with open(file_name) as file:
         return sum(1 for line in file if line.startswith("Q") or line.startswith("FFT"))
 
+
 def user_input():
     while True:
         try:
@@ -91,13 +97,21 @@ def user_input():
             continue
         else:
             if user_question_type == "quiz":
-                question = input("Enter question / enter options seperated by comma: ")
-                question_type(user_question_type, question)
-                break
+                while True:
+                    question = input(
+                        "Enter question / enter options seperated by comma: "
+                    )
+                    if "/" not in question or question.split("/")[1].strip() == "":
+                        print("Try again. Example of the input: 'question / options').")
+                    else:
+                        question_type(user_question_type, question)
+                        break
             elif user_question_type == "free-form text":
                 question = input("Question: ")
                 question_type(user_question_type, question)
                 break
+            break
+
 
 def question_type(user_input_question, question):
     if user_input_question == "free-form text":
