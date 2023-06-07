@@ -18,7 +18,10 @@ class Quiz:
     def __init__(self, filename):
         self.filename = filename
         self.question_counts = {}
-        self.question_weights = {} # create the 'question_weights' attribute as an empty dictionary
+        self.question_weights = (
+            {}
+        )  # create the 'question_weights' attribute as an empty dictionary
+        self._load_question_counts_from_csv()
 
     def run_quiz(self):
         active_questions = self._get_active_questions()
@@ -53,12 +56,13 @@ class Quiz:
             writer.writerows(rows)
 
         self._save_weights_to_csv()
+        self._save_counts_to_csv()
 
     def _run_fft_question(self, row):
         qu_id = row[0]
         question = row[1]
         answer = row[2]
-        self._increment_question_count(question)
+        self._increment_question_count(row[1])
 
         print(question)
         user_answer = input("YOUR ANSWER: ")
@@ -89,7 +93,6 @@ class Quiz:
             else:
                 print(f"Incorrect. The correct answer is: '{answer}'")
                 self._update_question_weight(qu_id, decrease=False, weight_index=5)
-
 
     def _load_weights_from_csv(self):
         with open(self.filename, "r") as file:
@@ -131,7 +134,6 @@ class Quiz:
                 question_id = row[0]
                 weight = self.question_weights.get(question_id, 1.0)
                 row[5] = round(weight, 2)
-                
 
         with open(self.filename, "w", newline="") as file:
             writer = csv.writer(file)
@@ -143,7 +145,6 @@ class Quiz:
         else:
             self.question_counts[question] = 1
 
-
     def get_question_count(self, question):
         return self.question_counts.get(question, 0)
 
@@ -154,6 +155,27 @@ class Quiz:
         with open(self.filename, "a", newline="") as file:
             writer = csv.writer(file)
             writer.writerow(["", question, answer, "", "0"])
+
+    def _load_question_counts_from_csv(self):
+        with open(self.filename, "r") as file:
+            reader = csv.reader(file)
+            next(reader)
+            for row in reader:
+                question = row[1]
+                count = int(row[4])
+                self.question_counts[question] = count
+
+    def _save_counts_to_csv(self):
+        with open(self.filename, "r") as file:
+            rows = list(csv.reader(file))
+            for row in rows[1:]:
+                question = row[1]
+                count = self.get_question_count(question)
+                row[4] = str(count)
+
+        with open(self.filename, "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerows(rows)
 
 
 def practice():
