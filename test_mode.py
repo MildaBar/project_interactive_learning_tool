@@ -15,12 +15,13 @@ def test_mode():
         return
     else:
         print("\n" + "You chose to a practice questions. Let's start!")
-        print("You chose to have a test! Let's start!")
+        print("\n" + "You chose to have a test! Let's start!")
         check_question()
+
 
 def check_question():
     filename = "statistics.csv"
-    total_questions = count_questions(filename)
+    # total_questions = count_questions(filename)
     while True:
         try:
             question_num = int(input("Select number of questions for the test: "))
@@ -33,7 +34,7 @@ def check_question():
             else:
                 check_question_activity(filename, question_num)
                 break
-        # check the error 
+        # check the error
         except SyntaxError:
             print("Invalid input. Please enter a valid number of questions.")
 
@@ -52,10 +53,12 @@ def check_question_activity(filename, num_questions):
             activity = row[3]
             if activity == "True":
                 questions.append(question_id)
-        
+
         if len(questions) < num_questions:
-            print("The number of available questions is less than the requested number.")
-            return 
+            print(
+                "The number of available questions is less than the requested number."
+            )
+            return
 
         selected_questions = random.sample(questions, num_questions)
         random.shuffle(selected_questions)
@@ -63,6 +66,8 @@ def check_question_activity(filename, num_questions):
         questionnaire = Questionnaire(filename)
         for question_id in selected_questions:
             questionnaire.choose_question(question_id)
+        questionnaire.print_score()
+
 
 class Questionnaire:
     def __init__(self, filename):
@@ -82,12 +87,8 @@ class Questionnaire:
                     else:
                         self._run_multiple_choice_question(row)
 
-        score = (self.answered_questions / self.total_questions) * 100
-        print(f"\nScore: {score}%")
-
-        self.score_recorder.record_score(score)
-
     def _run_fft_question(self, row):
+        qu_id = row[0]
         question = row[1]
         answer = row[2]
 
@@ -102,12 +103,15 @@ class Questionnaire:
         ):
             print("Correct")
             self.answered_questions += 1
+            self.increment_correct_questions(qu_id)
         else:
             print(f"Incorrect. The correct answer is {answer}")
         self.total_questions += 1
         self.asked_questions.append(question)
+        self.increment_question_asked(qu_id)
 
     def _run_multiple_choice_question(self, row):
+        qu_id = row[0]
         question, options = row[1].split(" / ")
         answer = eval(row[2])
 
@@ -121,10 +125,50 @@ class Questionnaire:
         if user_answer in answer:
             print(f"Correct.")
             self.answered_questions += 1
+            self.increment_correct_questions(qu_id)
         else:
             print(f"Incorrect. The correct answer is {answer}")
         self.total_questions += 1
         self.asked_questions.append(question)
+        self.increment_question_asked(qu_id)
+
+    def increment_correct_questions(self, question_id):
+        # open csv file and read its data
+        with open("statistics.csv", "r") as file:
+            reader = csv.reader(file)
+            data = list(reader)
+
+        column_index = 7
+
+        # update value in the CSV file
+        for row in data:
+            if row[0] == question_id:
+                row[column_index] = str(int(row[column_index]) + 1)
+
+        # write updated data back to csv file
+        with open("statistics.csv", "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+
+    def increment_question_asked(self, question_id):
+        with open("statistics.csv", "r") as file:
+            reader = csv.reader(file)
+            data = list(reader)
+
+        column_index = 6
+
+        for row in data:
+            if row[0] == question_id:
+                row[column_index] = str(int(row[column_index]) + 1)
+
+        with open("statistics.csv", "w", newline="") as file:
+            writer = csv.writer(file)
+            writer.writerows(data)
+
+    def print_score(self):
+        score = (self.answered_questions / self.total_questions) * 100
+        self.score_recorder.record_score(score)
+        print(f"\nScore: {score}%")
 
 
 # THE LIST OF SCORES SHOULD BE SAVED IN A SEPERATE results.txt FILE - THE DATE AND TIME SHOULD BE ADDED NEXT TO THE SCORE AS WEL
@@ -137,4 +181,3 @@ class ScoreRecorder:
         with open(self.filename, "a") as file:
             file.write(f"Date: {current_date}\n")
             file.write(f"Score: {score}%\n\n")
-
