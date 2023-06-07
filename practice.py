@@ -38,7 +38,9 @@ class Quiz:
                 if question_id in active_questions:
                     question_pool.append(row)
 
-            question_pool.sort(key=lambda row: self.question_weights.get(row[0], 1.0))
+            question_pool.sort(
+                key=lambda row: self.question_weights.get(row[0], 1.0), reverse=True
+            )
 
             for row in question_pool:
                 question_id = row[0]

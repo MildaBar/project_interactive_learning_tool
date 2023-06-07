@@ -2,6 +2,8 @@ from questions import question_mode
 from disable_enable import disable_enable_mode
 from practice import practice
 from test_mode import test_mode
+from statistics_mode import statistics_mode
+
 
 def main():
     options = [
@@ -29,17 +31,16 @@ def mode_choice(user_choice):
         case "Add questions mode":
             question_mode()
         case "Statistics viewing mode":
-            pass
+            statistics_mode()
         case "Disable / enable question mode":
             disable_enable_mode()
         case "Practice mode":
             practice()
         case "Test mode":
             test_mode()
-        case "Select profile":
-            pass
         case _:
             print("Invalid mode")
+
 
 if __name__ == "__main__":
     main()

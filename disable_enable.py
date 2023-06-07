@@ -61,24 +61,30 @@ def disable_enable_mode():
     while True:
         if user_choice == "disable":
             disable_question = input("Write ID of the question you want to DISABLE: ")
-            question_text, answer = get_answer_and_question(disable_question)
-            make_sure_disable = input(
-                f"Do you want to disablr QUESTION: '{question_text}', with ANSWER: '{answer}'? "
-            )
-            if make_sure_disable.lower() == "yes":
-                manager.disable_question(disable_question)
-                print("Question disabled sucessfully.")
-                break
+            if check_question_activity(disable_question) == True:
+                question_text, answer = get_answer_and_question(disable_question)
+                make_sure_disable = input(
+                    f"Do you want to disable QUESTION: '{question_text}', with ANSWER: '{answer}'? "
+                )
+                if make_sure_disable.lower() == "yes":
+                    manager.disable_question(disable_question)
+                    print("Question disabled sucessfully.")
+                    break
+            else:
+                print("This question is already disabled. Chose another one.")
         elif user_choice == "enable":
             enable_question = input("Write ID of the question you want to ENABLE: ")
-            question_text, answer = get_answer_and_question(enable_question)
-            make_sure_enable = input(
-                f"Do you want to enable QUESTION: '{question_text}', with ANSWER: '{answer}'? "
-            )
-            if make_sure_enable.lower() == "yes":
-                manager.enable_question(enable_question)
-                print("Question enabled sucessfully.")
-                break
+            if check_question_activity(enable_question) == True:
+                print("This question is already enabled. Chose another one.")
+            else:
+                question_text, answer = get_answer_and_question(enable_question)
+                make_sure_enable = input(
+                    f"Do you want to enable QUESTION: '{question_text}', with ANSWER: '{answer}'? "
+                )
+                if make_sure_enable.lower() == "yes":
+                    manager.enable_question(enable_question)
+                    print("Question enabled sucessfully.")
+                    break
 
 
 def get_answer_and_question(question_id):
@@ -90,3 +96,13 @@ def get_answer_and_question(question_id):
                 answer = row["ANSWER"]
                 return question_text, answer
     return None, None
+
+
+# check this part = if the question is already enabled or disabled
+def check_question_activity(q_id):
+    with open("statistics.csv", "r") as file:
+        reader = csv.reader(file)
+        for row in reader:
+            if row[0] == q_id and row[3] == "True":
+                return True
+    return False

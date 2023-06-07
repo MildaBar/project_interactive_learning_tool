@@ -39,7 +39,7 @@ def save_question_to_csv(file_path, question_type, question_text, answer):
         "ANSWER",
         "ACTIVITY",
         "Q SHOWN DURING PRACTICE",
-        "WEIGHT OF Q PRACTICE",
+        "WEIGHT",
         "Q SHOWN DURING TEST",
         "CORRECTLY ANSWERED Q",
     ]
@@ -47,6 +47,9 @@ def save_question_to_csv(file_path, question_type, question_text, answer):
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         if file.tell() == 0:
             writer.writeheader()  # Write headers only if the file is empty
+
+        if isinstance(answer, list):
+            answer = ", ".join(answer)
         writer.writerow(
             {
                 "ID": question_type + str(count_questions(file_path) + 1),
@@ -54,7 +57,7 @@ def save_question_to_csv(file_path, question_type, question_text, answer):
                 "ANSWER": str(answer),
                 "ACTIVITY": True,
                 "Q SHOWN DURING PRACTICE": 0,
-                "WEIGHT OF Q PRACTICE": 1.0,
+                "WEIGHT": 1.0,
                 "Q SHOWN DURING TEST": 0,
                 "CORRECTLY ANSWERED Q": 0,
             }
