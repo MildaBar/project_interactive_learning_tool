@@ -1,11 +1,11 @@
 import csv
-from disable_enable import DisableEnableQuestion
 
 
+# main logig of the question-adding process
 def question_mode():
+    print("You chose to add questions. Let's start!\n")
     while True:
         try:
-            print("You chose to add questions. Let's start!\n")
             user_input()
             if not continue_questions():
                 break
@@ -14,6 +14,7 @@ def question_mode():
             continue
 
 
+# prompt the user to enter whether they want to continue adding questions or not
 def continue_questions():
     while True:
         add_questions = input("\n" + "Do you want to continue? (yes/no): ").lower()
@@ -23,15 +24,7 @@ def continue_questions():
             return True
 
 
-class Question:
-    def __init__(self, question):
-        self.question = question
-
-    # The parent class has an empty save method that is overridden by the child classes to save the question and answer to a file.
-    def save(self):
-        pass
-
-
+# save questions to a csv file
 def save_question_to_csv(file_path, question_type, question_text, answer):
     fieldnames = [
         "ID",
@@ -46,7 +39,7 @@ def save_question_to_csv(file_path, question_type, question_text, answer):
     with open(file_path, mode="a", newline="") as file:
         writer = csv.DictWriter(file, fieldnames=fieldnames)
         if file.tell() == 0:
-            writer.writeheader()  # Write headers only if the file is empty
+            writer.writeheader()
 
         if isinstance(answer, list):
             answer = ", ".join(answer)
@@ -64,29 +57,32 @@ def save_question_to_csv(file_path, question_type, question_text, answer):
         )
 
 
-class Quiz_question(Question):
+class Quiz_question:
     def __init__(self, question, answer):
-        super().__init__(question)
+        self.question = question
         self.answer = [option.strip() for option in answer]
 
+    # call save method to save questions to csv file
     def save(self):
         save_question_to_csv("statistics.csv", "Q", self.question, self.answer)
 
 
-class Free_form_question(Question):
+class Free_form_question:
     def __init__(self, question, answer):
-        super().__init__(question)
+        self.question = question
         self.answer = answer
 
     def save(self):
         save_question_to_csv("statistics.csv", "FFT", self.question, self.answer)
 
 
+# return the number of questions in the file
 def count_questions(file_name):
     with open(file_name) as file:
         return sum(1 for line in file if line.startswith("Q") or line.startswith("FFT"))
 
 
+# prompt the user to enter the question type
 def user_input():
     while True:
         try:
@@ -116,6 +112,7 @@ def user_input():
             break
 
 
+# determine the type of question based on the user input
 def question_type(user_input_question, question):
     if user_input_question == "free-form text":
         answer = input("Enter answer: ")
