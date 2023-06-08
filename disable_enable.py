@@ -7,21 +7,6 @@ class DisableEnableQuestion:
     def __init__(self, file_path):
         self.file_path = file_path
 
-        # check this part
-        if not os.path.isfile(self.file_path):
-            with open(self.file_path, mode="w", newline="") as file:
-                writer = csv.writer(file)
-                writer.writerow(
-                    [
-                        "ID",
-                        "QUESTION",
-                        "ANSWER",
-                        "ACTIVITY",
-                        "SHOWN DURING PRACTICE",
-                        "WEIGHT",
-                    ]
-                )
-
     def enable_question(self, question):
         self._set_question_activity(question, True)
 
@@ -48,12 +33,7 @@ class DisableEnableQuestion:
         os.remove(self.file_path)
         shutil.move(temp_file_path, self.file_path)
 
-    def add_question(self, question):
-        with open(self.file_path, mode="a", newline="") as file:
-            writer = csv.writer(file)
-            writer.writerow([question, True])
-
-
+# user can disable or enable file
 def disable_enable_mode():
     print("You chose to disable / enable questions. Let's start!\n")
     user_choice = input("What do you want to do, disable or enable question: ").lower()
@@ -98,7 +78,6 @@ def get_answer_and_question(question_id):
     return None, None
 
 
-# check this part = if the question is already enabled or disabled
 def check_question_activity(q_id):
     with open("statistics.csv", "r") as file:
         reader = csv.reader(file)

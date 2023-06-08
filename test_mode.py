@@ -5,7 +5,7 @@ import difflib
 import csv
 
 
-# SELECT THE NR OF QUESTIONS FOR THE TEST WHICH IS NOT LARGER THAN THE TOTAL NUMBER OF QUESTIONS ADDED
+# run test mode program
 def test_mode():
     count_user_questions = count_questions("statistics.csv")
     if count_user_questions < 5:
@@ -14,14 +14,13 @@ def test_mode():
         )
         return
     else:
-        print("\n" + "You chose to a practice questions. Let's start!")
         print("\n" + "You chose to have a test! Let's start!")
         check_question()
 
 
+# prompt the user to enter the number of questions for the test
 def check_question():
     filename = "statistics.csv"
-    # total_questions = count_questions(filename)
     while True:
         try:
             question_num = int(input("Select number of questions for the test: "))
@@ -34,16 +33,11 @@ def check_question():
             else:
                 check_question_activity(filename, question_num)
                 break
-        # check the error
         except SyntaxError:
             print("Invalid input. Please enter a valid number of questions.")
 
 
-# THE QUESTIONS ARE CHOSEN FULLY RANDOMLY AND DEPEND OF DISABLE/ENABLE
-# EACH QUESTION CAN ONLY APPEAR ONCE AT THE MOST IN THE TEST
-# AT THE END OF THE QUESTIONS, THE USER IS SHOWS SCORE
-
-
+# find questions that are active
 def check_question_activity(filename, num_questions):
     with open("statistics.csv", "r") as file:
         reader = csv.reader(file)
@@ -69,13 +63,14 @@ def check_question_activity(filename, num_questions):
         questionnaire.print_score()
 
 
+# manage the overall questionnaire and its statistics
 class Questionnaire:
     def __init__(self, filename):
         self.filename = filename
         self.answered_questions = 0
         self.total_questions = 0
         self.asked_questions = []
-        self.score_recorder = ScoreRecorder("results.txt")
+        self.score_recorder = ResultRecorder("results.txt")
 
     def choose_question(self, question_id):
         with open(self.filename, "r") as file:
@@ -83,69 +78,23 @@ class Questionnaire:
             for row in reader:
                 if row[0] == question_id:
                     if row[0].startswith("FFT"):
-                        self._run_fft_question(row)
+                        fft_question = FFTQuestion(row)
+                        fft_question.run_question(self)
                     else:
-                        self._run_multiple_choice_question(row)
-
-    def _run_fft_question(self, row):
-        qu_id = row[0]
-        question = row[1]
-        answer = row[2]
-
-        if question in self.asked_questions:
-            return
-
-        print(question)
-        user_answer = input("YOUR ANSWER: ")
-        if (
-            difflib.SequenceMatcher(None, user_answer.lower(), answer.lower()).ratio()
-            >= 0.9
-        ):
-            print("Correct")
-            self.answered_questions += 1
-            self.increment_correct_questions(qu_id)
-        else:
-            print(f"Incorrect. The correct answer is {answer}")
-        self.total_questions += 1
-        self.asked_questions.append(question)
-        self.increment_question_asked(qu_id)
-
-    def _run_multiple_choice_question(self, row):
-        qu_id = row[0]
-        question, options = row[1].split(" / ")
-        answer = eval(row[2])
-
-        # if the questions is already present in the self.asked_questions list, the question has been asked before. Code executes the return statement, which skips the current iteration of the loop and moves to the next question
-        if question in self.asked_questions:
-            return
-
-        print(question)
-        print(f"Options: {options}")
-        user_answer = input("YOUR ANSWER: ")
-        if user_answer in answer:
-            print(f"Correct.")
-            self.answered_questions += 1
-            self.increment_correct_questions(qu_id)
-        else:
-            print(f"Incorrect. The correct answer is {answer}")
-        self.total_questions += 1
-        self.asked_questions.append(question)
-        self.increment_question_asked(qu_id)
+                        mc_question = MultipleChoiceQuestion(row)
+                        mc_question.run_question(self)
 
     def increment_correct_questions(self, question_id):
-        # open csv file and read its data
         with open("statistics.csv", "r") as file:
             reader = csv.reader(file)
             data = list(reader)
 
         column_index = 7
 
-        # update value in the CSV file
         for row in data:
             if row[0] == question_id:
                 row[column_index] = str(int(row[column_index]) + 1)
 
-        # write updated data back to csv file
         with open("statistics.csv", "w", newline="") as file:
             writer = csv.writer(file)
             writer.writerows(data)
@@ -168,16 +117,73 @@ class Questionnaire:
     def print_score(self):
         score = (self.answered_questions / self.total_questions) * 100
         self.score_recorder.record_score(score)
-        print(f"\nScore: {score}%")
+        rounded_score = round(score, 2)  # Round the score
+        formatted_score = "{:.2f}".format(rounded_score)
+        print(f"\nScore: {formatted_score}%")
 
 
-# THE LIST OF SCORES SHOULD BE SAVED IN A SEPERATE results.txt FILE - THE DATE AND TIME SHOULD BE ADDED NEXT TO THE SCORE AS WEL
-class ScoreRecorder:
+# free-form text question
+class FFTQuestion:
+    def __init__(self, row):
+        self.question_id = row[0]
+        self.question = row[1]
+        self.answer = row[2]
+
+    def run_question(self, questionnaire):
+        if self.question in questionnaire.asked_questions:
+            return
+
+        print(self.question)
+        user_answer = input("YOUR ANSWER: ")
+        if (
+            difflib.SequenceMatcher(
+                None, user_answer.lower(), self.answer.lower()
+            ).ratio()
+            >= 0.6
+        ):
+            print("Correct")
+            questionnaire.answered_questions += 1
+            questionnaire.increment_correct_questions(self.question_id)
+        else:
+            print(f"Incorrect. The correct answer is {self.answer}")
+        questionnaire.total_questions += 1
+        questionnaire.asked_questions.append(self.question)
+        questionnaire.increment_question_asked(self.question_id)
+
+
+class MultipleChoiceQuestion:
+    def __init__(self, row):
+        self.question_id = row[0]
+        self.question, options = row[1].split(" / ")
+        self.options = options.split(",")  # Store options as a list
+        self.answer = row[2]
+
+    def run_question(self, questionnaire):
+        if self.question in questionnaire.asked_questions:
+            return
+
+        print(self.question)
+        print(f"Options: {', '.join(self.options)}")
+        user_answer = input("YOUR ANSWER: ")
+        if user_answer.lower() == self.answer.lower():
+            print(f"Correct.")
+            questionnaire.answered_questions += 1
+            questionnaire.increment_correct_questions(self.question_id)
+        else:
+            print(f"Incorrect. The correct answer is {self.answer}")
+        questionnaire.total_questions += 1
+        questionnaire.asked_questions.append(self.question)
+        questionnaire.increment_question_asked(self.question_id)
+
+
+class ResultRecorder:
     def __init__(self, filename):
         self.filename = filename
 
     def record_score(self, score):
         current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        rounded_score = round(score, 2)  # Round the score
+        formatted_score = "{:.2f}".format(rounded_score)
         with open(self.filename, "a") as file:
             file.write(f"Date: {current_date}\n")
-            file.write(f"Score: {score}%\n\n")
+            file.write(f"Score: {formatted_score}%\n\n")

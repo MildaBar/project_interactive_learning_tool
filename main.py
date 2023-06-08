@@ -7,35 +7,40 @@ from statistics_mode import statistics_mode
 
 def main():
     options = [
-        "Add questions mode",
-        "Statistics viewing mode",
-        "Disable / enable question mode",
-        "Practice mode",
-        "Test mode",
+        "Add questions",
+        "Statistics",
+        "Disable / enable questions",
+        "Practice questions",
+        "Test",
     ]
 
     print("Hello! This is a list of modes:")
     for i, option in enumerate(options):
         print(f"{i+1}. {option}")
 
-    user_input = input(
-        "What mode do you want to choose? Write the number of a choice: "
-    )
-    user_choice = options[int(user_input) - 1]
+    while True:
+        user_input = input("What mode do you want to choose? Write the number of your choice: ")
+        try:
+            user_choice = options[int(user_input) - 1]
+            break
+        except (ValueError, IndexError):
+            print("Invalid input. Please enter a valid number.")
+
     mode_choice(user_choice)
+
 
 def mode_choice(user_choice):
     try:
         match user_choice:
-            case "Add questions mode":
+            case "Add questions":
                 question_mode()
-            case "Statistics viewing mode":
+            case "Statistics":
                 statistics_mode()
-            case "Disable / enable question mode":
+            case "Disable / enable questions":
                 disable_enable_mode()
-            case "Practice mode":
+            case "Practice questions":
                 practice()
-            case "Test mode":
+            case "Test":
                 test_mode()
             case _:
                 print("Invalid mode")

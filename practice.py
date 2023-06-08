@@ -221,6 +221,6 @@ def practice():
         )
         return
     else:
-        print("\n" + "You chose to a practice questions. Let's start!")
+        print("\n" + "You chose to practice questions. Let's start!")
         practice = Practice("statistics.csv")
         practice.run_practice_mode()
