@@ -1,7 +1,7 @@
 import csv
 
 
-# main logig of the question-adding process
+# main login of the question-adding process
 def question_mode():
     print("You chose to add questions. Let's start!\n")
     while True:
@@ -14,7 +14,7 @@ def question_mode():
             continue
 
 
-# prompt the user to enter whether they want to continue adding questions or not
+# prompt the user to enter wether they want to continue adding questions or not
 def continue_questions():
     while True:
         add_questions = input("\n" + "Do you want to continue? (yes/no): ").lower()
