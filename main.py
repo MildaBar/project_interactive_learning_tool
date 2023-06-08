@@ -12,7 +12,6 @@ def main():
         "Disable / enable question mode",
         "Practice mode",
         "Test mode",
-        "Select profile",
     ]
 
     print("Hello! This is a list of modes:")
@@ -25,21 +24,23 @@ def main():
     user_choice = options[int(user_input) - 1]
     mode_choice(user_choice)
 
-
 def mode_choice(user_choice):
-    match user_choice:
-        case "Add questions mode":
-            question_mode()
-        case "Statistics viewing mode":
-            statistics_mode()
-        case "Disable / enable question mode":
-            disable_enable_mode()
-        case "Practice mode":
-            practice()
-        case "Test mode":
-            test_mode()
-        case _:
-            print("Invalid mode")
+    try:
+        match user_choice:
+            case "Add questions mode":
+                question_mode()
+            case "Statistics viewing mode":
+                statistics_mode()
+            case "Disable / enable question mode":
+                disable_enable_mode()
+            case "Practice mode":
+                practice()
+            case "Test mode":
+                test_mode()
+            case _:
+                print("Invalid mode")
+    except FileNotFoundError:
+        print("No CSV file found. Please choose another mode.")
 
 
 if __name__ == "__main__":
