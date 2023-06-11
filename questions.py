@@ -3,7 +3,7 @@ import csv
 
 # main login of the question-adding process
 def question_mode():
-    print("You chose to add questions. Let's start!\n")
+    print("You choose to add questions. Let's start!\n")
     while True:
         try:
             user_input()

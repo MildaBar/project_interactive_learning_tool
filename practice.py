@@ -32,7 +32,7 @@ class WeightHandler:
         self.filename = filename
         self.question_weights = {}
 
-    def _load_weights_from_csv(self):
+    def load_weights_from_csv(self):
         with open(self.filename, "r") as file:
             reader = csv.reader(file)
             next(reader)
@@ -41,7 +41,7 @@ class WeightHandler:
                 weight = float(row[5])
                 self.question_weights[question_id] = weight
 
-    def _update_question_weight(self, qu_id, decrease, weight_index):
+    def update_question_weight(self, qu_id, decrease, weight_index):
         # Update the weight in memory
         weight = self.question_weights[qu_id]
         if decrease:
@@ -65,7 +65,7 @@ class WeightHandler:
             writer = csv.writer(file)
             writer.writerows(rows)
 
-    def _save_weights_to_csv(self):
+    def save_weights_to_csv(self):
         with open(self.filename, "r") as file:
             rows = list(csv.reader(file))
             for row in rows[1:]:
@@ -86,7 +86,7 @@ class CountHandler:
         self.filename = filename
         self.question_counts = {}
 
-    def _load_question_counts_from_csv(self):
+    def load_question_counts_from_csv(self):
         with open(self.filename, "r") as file:
             reader = csv.reader(file)
             next(reader)
@@ -95,7 +95,7 @@ class CountHandler:
                 count = int(row[4])
                 self.question_counts[question] = count
 
-    def _increment_question_count(self, question):
+    def increment_question_count(self, question):
         if question in self.question_counts:
             self.question_counts[question] += 1
         else:
@@ -104,7 +104,7 @@ class CountHandler:
     def get_question_count(self, question):
         return self.question_counts.get(question, 0)
 
-    def _save_counts_to_csv(self):
+    def save_counts_to_csv(self):
         with open(self.filename, "r") as file:
             rows = list(csv.reader(file))
             for row in rows[1:]:
@@ -124,11 +124,11 @@ class Practice:
         self.question_handler = QuestionHandler(filename)
         self.weight_handler = WeightHandler(filename)
         self.count_handler = CountHandler(filename)
-        self.count_handler._load_question_counts_from_csv()
+        self.count_handler.load_question_counts_from_csv()
 
     def run_practice_mode(self):
-        active_questions = self._get_active_questions()
-        self.weight_handler._load_weights_from_csv()
+        active_questions = self.get_active_questions()
+        self.weight_handler.load_weights_from_csv()
 
         question_pool = []
 
@@ -148,9 +148,9 @@ class Practice:
             for row in question_pool:
                 question_id = row[0]
                 if row[0].startswith("FFT"):
-                    self._run_fft_question(row)
+                    self.run_fft_question(row)
                 else:
-                    self._run_multiple_choice_question(row)
+                    self.run_multiple_choice_question(row)
                 # Update the question counts in the CSV rows
                 question = row[1]
                 count = self.count_handler.get_question_count(question)
@@ -160,54 +160,54 @@ class Practice:
             writer = csv.writer(file)
             writer.writerows(rows)
 
-        self.weight_handler._save_weights_to_csv()
-        self.count_handler._save_counts_to_csv()
+        self.weight_handler.save_weights_to_csv()
+        self.count_handler.save_counts_to_csv()
 
-    def _run_fft_question(self, row):
+    def run_fft_question(self, row):
         qu_id = row[0]
         question = row[1]
         answer = row[2]
-        self.count_handler._increment_question_count(row[1])
+        self.count_handler.increment_question_count(row[1])
 
-        print(question)
+        print(f"\nQuestion: {question}")
         user_answer = input("YOUR ANSWER: ")
         if (
             difflib.SequenceMatcher(None, user_answer.lower(), answer.lower()).ratio()
             >= 0.6
         ):
             print("Correct")
-            self.weight_handler._update_question_weight(
+            self.weight_handler.update_question_weight(
                 qu_id, decrease=True, weight_index=5
             )
         else:
             print(f"Incorrect. The correct answer is: '{answer}'")
-            self.weight_handler._update_question_weight(
+            self.weight_handler.update_question_weight(
                 qu_id, decrease=False, weight_index=5
             )
 
-    def _run_multiple_choice_question(self, row):
+    def run_multiple_choice_question(self, row):
         qu_id = row[0]
         question_and_options = row[1].split(" / ")
         answer = row[2]
-        self.count_handler._increment_question_count(row[1])
+        self.count_handler.increment_question_count(row[1])
 
         if len(question_and_options) == 2:
             question, options = question_and_options
-            print(question)
+            print(f"\nQuestion: {question}")
             print(f"Options: {options}")
             user_answer = input("YOUR ANSWER: ")
             if user_answer in answer:
                 print(f"Correct.")
-                self.weight_handler._update_question_weight(
+                self.weight_handler.update_question_weight(
                     qu_id, decrease=True, weight_index=5
                 )
             else:
                 print(f"Incorrect. The correct answer is: '{answer}'")
-                self.weight_handler._update_question_weight(
+                self.weight_handler.update_question_weight(
                     qu_id, decrease=False, weight_index=5
                 )
 
-    def _get_active_questions(self):
+    def get_active_questions(self):
         return check_question_activity(self.filename)
 
 
@@ -221,6 +221,6 @@ def practice():
         )
         return
     else:
-        print("\n" + "You chose to practice questions. Let's start!")
+        print("\n" + "You choose to practice questions. Let's start!")
         practice = Practice("statistics.csv")
         practice.run_practice_mode()

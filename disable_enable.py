@@ -8,12 +8,12 @@ class DisableEnableQuestion:
         self.file_path = file_path
 
     def enable_question(self, question):
-        self._set_question_activity(question, True)
+        self.set_question_activity(question, True)
 
     def disable_question(self, question):
-        self._set_question_activity(question, False)
+        self.set_question_activity(question, False)
 
-    def _set_question_activity(self, question, activity):
+    def set_question_activity(self, question, activity):
         temp_file_path = self.file_path + ".temp"
         with open(self.file_path, mode="r") as file, open(
             temp_file_path, mode="w", newline=""

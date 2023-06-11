@@ -133,7 +133,7 @@ class FFTQuestion:
         if self.question in questionnaire.asked_questions:
             return
 
-        print(self.question)
+        print(f"\nQuestion: {self.question}")
         user_answer = input("YOUR ANSWER: ")
         if (
             difflib.SequenceMatcher(
@@ -145,7 +145,7 @@ class FFTQuestion:
             questionnaire.answered_questions += 1
             questionnaire.increment_correct_questions(self.question_id)
         else:
-            print(f"Incorrect. The correct answer is {self.answer}")
+            print(f"Incorrect. The correct answer is: '{self.answer}'")
         questionnaire.total_questions += 1
         questionnaire.asked_questions.append(self.question)
         questionnaire.increment_question_asked(self.question_id)
@@ -162,7 +162,7 @@ class MultipleChoiceQuestion:
         if self.question in questionnaire.asked_questions:
             return
 
-        print(self.question)
+        print(f"\nQuestion: {self.question}")
         print(f"Options: {', '.join(self.options)}")
         user_answer = input("YOUR ANSWER: ")
         if user_answer.lower() == self.answer.lower():
@@ -170,7 +170,7 @@ class MultipleChoiceQuestion:
             questionnaire.answered_questions += 1
             questionnaire.increment_correct_questions(self.question_id)
         else:
-            print(f"Incorrect. The correct answer is {self.answer}")
+            print(f"Incorrect. The correct answer is: '{self.answer}'")
         questionnaire.total_questions += 1
         questionnaire.asked_questions.append(self.question)
         questionnaire.increment_question_asked(self.question_id)
